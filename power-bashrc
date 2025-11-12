@@ -1,0 +1,147 @@
+# aliases
+alias ..="cd .."
+alias ...="cd ../.."
+
+
+# bindcommands
+mkcd() {
+  mkdir -p "$1" && cd "$1" || return
+}
+
+# Extract archive and auto-detect type
+extract() {
+  if [ -f "$1" ]; then
+    case "$1" in
+      *.tar.bz2) tar xjf "$1" ;;
+      *.tar.gz)  tar xzf "$1" ;;
+      *.bz2)     bunzip2 "$1" ;;
+      *.rar)     unrar x "$1" ;;
+      *.gz)      gunzip "$1" ;;
+      *.tar)     tar xf "$1" ;;
+      *.tbz2)    tar xjf "$1" ;;
+      *.tgz)     tar xzf "$1" ;;
+      *.zip)     unzip "$1" ;;
+      *.7z)      7z x "$1" ;;
+      *) echo "Don't know how to extract '$1'" ;;
+    esac
+  else
+    echo "'$1' is not a valid file"
+  fi
+}
+
+# Compress a file or folder based on extension
+compress() {
+  if [ -z "$2" ]; then
+    echo "Usage: compress <target> <format: zip|tar|gz|bz2|xz>"
+    return 1
+  fi
+  case "$2" in
+    zip)  zip -r "${1%/}.zip" "$1" ;;
+    tar)  tar cf "${1%/}.tar" "$1" ;;
+    gz)   tar czf "${1%/}.tar.gz" "$1" ;;
+    bz2)  tar cjf "${1%/}.tar.bz2" "$1" ;;
+    xz)   tar cJf "${1%/}.tar.xz" "$1" ;;
+    *) echo "Unknown format: $2" ;;
+  esac
+}
+
+# Show what's inside an archive without extracting
+peek() {
+  case "$1" in
+    *.zip) unzip -l "$1" ;;
+    *.tar*) tar -tf "$1" ;;
+    *.rar) unrar l "$1" ;;
+    *.7z)  7z l "$1" ;;
+    *) echo "Don't know how to peek into '$1'" ;;
+  esac
+}
+
+gitcommit () {
+	git add . && git commit -m $1"
+}
+
+# Make a temporary directory and cd into it
+mktempd() {
+  dir=$(mktemp -d) && cd "$dir" || return
+  echo "Entered temp dir: $dir"
+}
+
+# Create a note file in ~/notes and open it
+note() {
+  mkdir -p ~/notes
+  nano ~/notes/"$1".md
+}
+
+# Search command history for a string
+hgrep() {
+  history | grep "$1"
+}
+
+# Create a Python virtualenv and activate it
+mkvenv() {
+  python3 -m venv "$1" && source "$1/bin/activate"
+}
+
+# Find and cd into a directory by name
+cdfind() {
+  dir=$(find . -type d -name "$1" 2>/dev/null | head -n 1)
+  if [ -n "$dir" ]; then
+    cd "$dir" || return
+  else
+    echo "No directory named '$1' found."
+  fi
+}
+
+# Kill a process by name
+fkill() {
+  local pid
+  pid=$(ps -ef | grep "$1" | grep -v grep | awk '{print $2}')
+  if [ -z "$pid" ]; then
+    echo "No process found for: $1"
+  else
+    echo "Killing: $pid"
+    kill -9 $pid
+  fi
+}
+
+# Show disk usage of the largest files/folders
+biggest() {
+  du -ah . | sort -rh | head -n "${1:-10}"
+}
+
+# Search for a process
+psgrep() {
+  ps aux | grep -i --color=auto "$1" | grep -v grep
+}
+
+
+# Show your public IP
+myip() {
+  curl -s https://api.ipify.org
+}
+
+# Get weather for a city
+weather() {
+  curl -s "wttr.in/$1?format=3"
+}
+
+# Get file info quickly
+finfo() {
+  file "$1"
+  du -h "$1"
+}
+
+
+# Run a Docker container and enter it interactively
+dkrun() {
+  docker run -it --rm "$1" /bin/bash
+}
+
+# Backup a file with a timestamp
+mkbackup() {
+  cp "$1" "${1}_$(date +%Y%m%d_%H%M%S).bak"
+}
+
+findport() {
+  sudo lsof -i :"$1" | grep LISTEN
+}
