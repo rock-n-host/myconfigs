@@ -1,7 +1,9 @@
 # aliases
 alias ..="cd .."
 alias ...="cd ../.."
-
+alias dcup="docker compose up -d"
+alias dcdown="docker compose down"
+alias pubip="curl -s https://api.ipify.org"
 
 # bindcommands
 mkcd() {
@@ -57,7 +59,7 @@ peek() {
 }
 
 gitcommit () {
-	git add . && git commit -m $1"
+	git add --all && git commit -m "$1"
 }
 
 # Make a temporary directory and cd into it
@@ -68,8 +70,8 @@ mktempd() {
 
 # Create a note file in ~/notes and open it
 note() {
-  mkdir -p ~/notes
-  nano ~/notes/"$1".md
+  cd ~/notes
+  vim ~/notes/"$1".md
 }
 
 # Search command history for a string
@@ -105,19 +107,13 @@ fkill() {
 }
 
 # Show disk usage of the largest files/folders
-biggest() {
+largestfiles() {
   du -ah . | sort -rh | head -n "${1:-10}"
 }
 
 # Search for a process
 psgrep() {
   ps aux | grep -i --color=auto "$1" | grep -v grep
-}
-
-
-# Show your public IP
-myip() {
-  curl -s https://api.ipify.org
 }
 
 # Get weather for a city
@@ -131,10 +127,8 @@ finfo() {
   du -h "$1"
 }
 
-
-# Run a Docker container and enter it interactively
-dkrun() {
-  docker run -it --rm "$1" /bin/bash
+dcrun () {
+    docker run -it --rm "$1" /bin/bash
 }
 
 # Backup a file with a timestamp
