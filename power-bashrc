@@ -1,8 +1,12 @@
+# vars
+EDITOR=vim
+BROWSER=firefox
+SERVICES=~/services
+
 # aliases
-alias ..="cd .."
-alias ...="cd ../.."
-alias dcup="docker compose up -d"
-alias dcdown="docker compose down"
+alias code="$EDITOR"
+alias cdd="cd .."
+alias cddd="cd ../.."
 alias pubip="curl -s https://api.ipify.org"
 
 # bindcommands
@@ -62,6 +66,11 @@ gitcommit () {
 	git add --all && git commit -m "$1"
 }
 
+# open a browser on a specific site
+browse() {
+  $BROWSER $1
+}
+
 # Make a temporary directory and cd into it
 mktempd() {
   dir=$(mktemp -d) && cd "$dir" || return
@@ -71,7 +80,7 @@ mktempd() {
 # Create a note file in ~/notes and open it
 note() {
   cd ~/notes
-  vim ~/notes/"$1".md
+  $EDITOR ~/notes/"$1".md
 }
 
 # Search command history for a string
@@ -129,6 +138,18 @@ finfo() {
 
 dcrun () {
     docker run -it --rm "$1" /bin/bash
+}
+
+# run a Docker Compose service by it's name
+dcstart () {
+  cd $SERVICES/$1
+  docker compose up -d
+}
+
+# stop a Docker Compose service by it's name
+dcdown () {
+  cd $SERVICES/$1
+  docker compose down
 }
 
 # Backup a file with a timestamp
