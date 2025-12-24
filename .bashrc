@@ -6,14 +6,16 @@ fortune # prints a random quote
 # =========== variables =========== #
 # ================================= #
 EDITOR=nvim # Neovim
-alias code="$EDITOR"
 BROWSER=brave
 SERVICES=~/services
+alias code="$EDITOR"
 
 
 # ================================= #
 # ======= filesystem utils ======== #
 # ================================= #
+alias cls="clear"
+alias ll="ls -la"
 alias cdd="cd .."
 alias cddd="cd ../.."
 
@@ -71,7 +73,8 @@ peek() {
 
 # Make a temporary directory and cd into it
 mktempd() {
-    dir=$(mktemp -d) && cd "$dir" || return
+    local dir
+    dir="$(mktemp -d)" && cd "$dir" || return
     echo "Entered temp dir: $dir"
 }
 
@@ -112,7 +115,80 @@ finfo() {
 
 # Show disk usage of the largest files/
 largestfiles() {
-    du -ah . | sort -rh | head -n "${1:-1
+    du -ah . | sort -rh | head -n "${1:-10}"
+}
+
+# append text to a file
+append() {
+	# GitLab: https://www.gitlab.com/dwt1/miniutils
+	# License: https://www.gitlab.com/dwt1/miniutils/LICENSE
+	# Contributors: Derek Taylor
+	
+	# Set with the flags "-e", "-u","-o pipefail" cause the script to fail
+	# if certain things happen, which is a good thing.  Otherwise, we can
+	# get hidden bugs that are hard to discover.
+	set -euo pipefail
+	
+	# Check if a filename argument is provided
+	if [ "$#" -ne 1 ]; then
+	    echo "Usage: append <filename>"
+	    exit
+	fi
+	
+	purple="$(tput setaf 5 bold)"
+	green="$(tput setaf 2 bold)"
+	reset="$(tput sgr0)"
+	
+	filename="$1"
+	
+	# Use 'read -e' to get user input with readline support
+	# -p sets the prompt
+	# -r prevents backslash escapes from being interpreted
+	echo "Enter text to append to file ${purple}$filename${reset}:"
+	read -e -r -p "${purple}>>>${reset} " input_text
+	
+	# Append the entered text followed by a newline to the file
+	echo "$input_text" >> "$filename"
+	echo "${green}✓${reset} Text successfully appended!"
+}
+
+# prepend text to a file
+prepend () {
+	# GitLab: https://www.gitlab.com/dwt1/miniutils
+	# License: https://www.gitlab.com/dwt1/miniutils/LICENSE
+	# Contributors: Derek Taylor
+	
+	# Set with the flags "-e", "-u","-o pipefail" cause the script to fail
+	# if certain things happen, which is a good thing.  Otherwise, we can
+	# get hidden bugs that are hard to discover.
+	set -euo pipefail
+	
+	# Check if a filename argument is provided
+	if [ "$#" -ne 1 ]; then
+	    echo "Usage: prepend <filename>"
+	    exit
+	fi
+	
+	purple="$(tput setaf 5 bold)"
+	green="$(tput setaf 2 bold)"
+	reset="$(tput sgr0)"
+	
+	filename="$1"
+	
+	# Prompt for input
+	echo "Enter text to prepend to file ${purple}$filename${reset}"
+	read -e -r -p "${purple}>>>${reset} " input_text
+	
+	# Prepend the text to the beginning of the file
+	# Create a temp file, write new text, then original content
+	temp_file=$(mktemp)
+	
+	printf "%s\n" "$input_text" > "$temp_file"
+	cat "$filename" >> "$temp_file"
+	
+	mv "$temp_file" "$filename"
+	
+	echo "${green}✓${reset} Text successfully prepended!"
 }
 
 
@@ -153,8 +229,8 @@ dcdown () {
 }
 
 # Backup a file with a timestamp
-mkbackup() {
-    cp "$1" "${1}_$(date +%Y%m%d_%H%M%S
+mkbackup () {
+    cp "$1" "${1}_$(date +%Y%m%d_%H%M%S)"
 }
 
 
@@ -162,11 +238,28 @@ mkbackup() {
 # ======= networking tools ======== #
 # ================================= #
 # get your public IP
-alias pubip="curl -s https://api.ipify.
+alias pubip="curl -s https://api.ipify.com"
 
 # quickly add and commit
 gitcommit () {
-    git add --all && git commit -m "$1"
+    purple="$(tput setaf 5 bold)"
+    reset="$(tput sgr0)"
+
+    # Add all files
+    git add --all
+    # Prompt for commit message
+    echo "Enter commit message:"
+    read -e -r -p "${purple}>>> ${reset}" message
+    # Abort if message is empty
+    if [[ -z "$message" ]]; then
+        echo "Commit aborted: empty commit message."
+        return 1
+    fi
+
+    # Commit
+    git commit -m "$message"
+    # push changes
+    # git push
 }
 
 # open a browser on a specific site
