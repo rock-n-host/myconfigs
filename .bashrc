@@ -19,6 +19,11 @@ alias ll="ls -la"
 alias cdd="cd .."
 alias cddd="cd ../.."
 
+updatebash () {
+    mv ~/.bashrc ~/.bashrc_backup
+    curl -o ~/.bashrc https://github.com/rock-n-host/myconfigs/bashrc
+}
+
 mkcd() {
     mkdir -p "$1" && cd "$1" || return
 }
@@ -275,4 +280,13 @@ weather() {
 # find out what's using a port
 findport() {
     sudo lsof -i :"$1" | grep LISTEN
+}
+
+# download entire website
+downwebsite () {
+    if [ -z "$2" ]; then
+        echo "Usage: downwebsite [URL]"
+        return 1
+    fi
+    wget --mirror --convert-links --page-requisites --no-parent $1
 }
