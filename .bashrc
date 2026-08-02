@@ -21,7 +21,7 @@ alias cddd="cd ../.."
 
 updatebash () {
     mv ~/.bashrc ~/.bashrc_backup
-    curl -o ~/.bashrc https://github.com/rock-n-host/myconfigs/bashrc
+    curl -O https://github.com/rock-n-host/myconfigs/blob/d238607ff570a729a0feeecfbf71cbf743a24621/.bashrc
 }
 
 mkcd() {
