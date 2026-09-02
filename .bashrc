@@ -20,8 +20,8 @@ alias cdd="cd .."
 alias cddd="cd ../.."
 
 updatebash () {
-    mv ~/.bashrc ~/.bashrc_backup
-    curl -O https://github.com/rock-n-host/myconfigs/blob/d238607ff570a729a0feeecfbf71cbf743a24621/.bashrc
+    mv .bashrc "~/.bashrc_backup_$(date +%Y%m%d_%H%M%S)"
+    curl -O https://raw.githubusercontent.com/rock-n-host/myconfigs/.bashrc
 }
 
 mkcd() {
@@ -235,7 +235,7 @@ dcdown () {
 
 # Backup a file with a timestamp
 mkbackup () {
-    cp "$1" "${1}_$(date +%Y%m%d_%H%M%S)"
+    cp "$1" "${1}_(date +%Y%m%d_%H%M%S)"
 }
 
 
